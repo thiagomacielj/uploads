@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Arquivos Enviados</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-blue-100 min-h-screen">
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div id="toast" class="fixed top-6 right-6 z-50">
+      {% for category, message in messages %}
+        <div class="mb-2 px-6 py-3 rounded shadow-lg text-white bg-red-600 animate-fade-in-down flex items-center gap-2">
+          <!-- Ícone de sucesso -->
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+          </svg>
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+    <script>
+      setTimeout(() => {
+        const toast = document.getElementById('toast');
+        if (toast) toast.style.display = 'none';
+      }, 2500);
+    </script>
+  {% endif %}
+{% endwith %}
+
+    
+
+    <!-- Header -->
+    <nav class="bg-white shadow mb-8">
+        <div class="container mx-auto px-4 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                </svg>
+                <span class="text-2xl font-bold text-blue-700">Dashboard de Uploads</span>
+            </div>
+            <a href="{{ url_for('index') }}" class="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700 transition">
+                Novo Upload
+            </a>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4">
+        <div class="bg-white rounded-xl shadow-lg p-6">
+            <h2 class="text-xl font-semibold text-blue-700 mb-4 flex items-center gap-2">
+                <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V7"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16 3H8a2 2 0 00-2 2v2h12V5a2 2 0 00-2-2z"/>
+                </svg>
+                Arquivos Enviados
+            </h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-blue-100">
+                    <!-- ...existing code... -->
+<thead class="bg-blue-50">
+    <tr>
+        <th class="py-3 px-4 text-left font-medium text-blue-700">Nome</th>
+        <th class="py-3 px-4 text-left font-medium text-blue-700">Arquivo</th>
+        <th class="py-3 px-4 text-left font-medium text-blue-700">Data</th>
+        <th class="py-3 px-4 text-left font-medium text-blue-700">Download</th>
+        <th class="py-3 px-4 text-left font-medium text-blue-700">Excluir</th>
+    </tr>
+</thead>
+<tbody class="bg-white divide-y divide-blue-50">
+    {% for upload in uploads %}
+    <tr class="hover:bg-blue-50 transition">
+        <td class="py-2 px-4">{{ upload.name }}</td>
+        <td class="py-2 px-4">
+            <span class="inline-flex items-center gap-2">
+                <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 17v-6m0 0l-2 2m2-2l2 2m-6 6h12a2 2 0 002-2V7a2 2 0 00-2-2H6a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                </svg>
+                {{ upload.filename }}
+            </span>
+        </td>
+        <td class="py-2 px-4">{{ upload.date }}</td>
+        <td class="py-2 px-4">
+            <a href="{{ url_for('uploaded_file', filename=upload.filename) }}" 
+               class="inline-flex items-center gap-1 text-blue-600 hover:underline font-medium" target="_blank">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M7 10l5 5 5-5"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 15V3"/>
+                </svg>
+                Baixar
+            </a>
+        </td>
+        <td class="py-2 px-4">
+            <form method="POST" action="{{ url_for('delete_file', filename=upload.filename) }}">
+                <button type="button"
+        class="inline-flex items-center gap-1 bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded shadow transition"
+        onclick="abrirModal('{{ url_for('delete_file', filename=upload.filename) }}')">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+    </svg>
+    Excluir
+</button>
+            </form>
+        </td>
+    </tr>
+    {% else %}
+    <tr>
+        <td colspan="5" class="py-6 px-4 text-center text-gray-400 text-lg">Nenhum arquivo enviado ainda.</td>
+    </tr>
+    {% endfor %}
+</tbody>
+
+<!-- Modal de confirmação -->
+<div id="modal-excluir" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden">
+  <div class="bg-white rounded-lg shadow-lg p-8 max-w-sm w-full text-center">
+    <h3 class="text-lg font-bold mb-4 text-red-600">Confirmar exclusão</h3>
+    <p class="mb-6 text-gray-700">Tem certeza que deseja excluir este arquivo?</p>
+    <form id="modalForm" method="POST">
+      <div class="flex justify-center gap-4">
+        <button type="button" id="cancelarModal" class="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400 text-gray-800">Cancelar</button>
+        <button type="submit" class="px-4 py-2 rounded bg-red-600 hover:bg-red-700 text-white">Excluir</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function abrirModal(actionUrl) {
+    const modal = document.getElementById('modal-excluir');
+    const form = document.getElementById('modalForm');
+    form.action = actionUrl;
+    modal.classList.remove('hidden');
+}
+document.getElementById('cancelarModal').onclick = function() {
+    document.getElementById('modal-excluir').classList.add('hidden');
+};
+</script>
+
+</body>
+<!-- ...existing code... -->
+</html>
